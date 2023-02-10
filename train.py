@@ -28,7 +28,8 @@ dataset = 'openwebtext'
 batch_size = 32
 block_size = 512
 # model
-device = 'cuda:0'
+# device = 'cuda:0'
+device = 'mps'
 init_from = 'scratch' # 'scratch' or 'resume' or 'gpt2*'
 dropout = 0.1
 n_layer = 12
@@ -48,8 +49,10 @@ min_lr = 1e-5 # minimum learning rate
 
 os.makedirs(out_dir, exist_ok=True)
 torch.manual_seed(1337)
-torch.backends.cuda.matmul.allow_tf32 = True # allow tf32 on matmul
-torch.backends.cudnn.allow_tf32 = True # allow tf32 on cudnn
+
+# TODO
+# torch.backends.cuda.matmul.allow_tf32 = True # allow tf32 on matmul
+# torch.backends.cudnn.allow_tf32 = True # allow tf32 on cudnn
 
 # poor man's data loader, TODO use real DataLoader...
 data_dir = os.path.join('data', dataset)
@@ -95,7 +98,9 @@ def estimate_loss(eval_iters=50):
         losses = torch.zeros(eval_iters)
         for k in range(eval_iters):
             X, Y = get_batch(split)
-            with torch.amp.autocast(device_type="cuda", dtype=torch.bfloat16):
+            with torch.amp.autocast(# device_type="cuda",
+                    device_type="cpu",
+                    dtype=torch.bfloat16):
                 logits, loss = model(X, Y)
             losses[k] = loss.item()
         out[split] = losses.mean()
@@ -168,7 +173,7 @@ while True:
                 torch.save(checkpoint, os.path.join(out_dir, 'ckpt.pt'))
 
     X, Y = get_batch('train')
-    with torch.amp.autocast(device_type="cuda", dtype=torch.bfloat16):
+    with torch.amp.autocast(device_type="cpu", dtype=torch.bfloat16):
         logits, loss = model(X, Y)
 
     optimizer.zero_grad(set_to_none=True)
