@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "app"
+version = "0.1.0"
+description = ""
+authors = ["Handol Park <handolpark12@gmail.com>"]
+readme = "README.org"
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+torch = "^1.13.1"
+torchvision = "^0.14.1"
+torchaudio = "^0.13.1"
+datasets = "^2.9.0"
+tiktoken = "^0.2.0"
+wandb = "^0.13.10"
+ipython = "^8.9.0"
+ipykernel = "^6.21.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
